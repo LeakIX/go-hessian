@@ -1,6 +1,7 @@
 package hessian
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -49,7 +50,7 @@ type Proxy struct {
 }
 
 // Invoke input method name and arguments, it will send request to server, and parse response to interface
-func (c *Proxy) Invoke(m string, args ...interface{}) ([]interface{}, error) {
+func (c *Proxy) Invoke(m string, args ...interface{}) (_ []interface{}, err error) {
 
 	c.serializer.Flush()
 
@@ -76,12 +77,16 @@ func (c *Proxy) Invoke(m string, args ...interface{}) ([]interface{}, error) {
 	}
 
 	c.deserializer.Reset(resp.Body)
-
+	// Set the default error return value
+	err = errors.New("deserialize failed")
+	defer func() {
+		// Recover on read issues
+		_ = recover()
+	}()
 	ans, err := c.deserializer.Read()
 	if err != nil {
 		return nil, err
 	}
-
 	return ans, nil
 }
 

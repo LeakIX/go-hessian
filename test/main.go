@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"time"
 
-	hessian "github.com/ggwhite/go-hessian"
+	hessian "github.com/LeakIX/go-hessian"
 )
 
 type User struct {
